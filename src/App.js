@@ -8,8 +8,8 @@ class App extends Component {
        super(props);
        this.state = {
          lines:[
-            <Line lineText='Phack this sheeeeaaat' key="0" id="0" /> ,
-            <Line lineText='am gonna pop some tags only got 20 dollars in my pocket' key="1" id="1" />
+            <Line lineText='This is the ultimate sandboxed-linux-based personal website' key="0" id="0" /> ,
+            <Line lineText='type `help` to view the list of available commands' key="1" id="1" />
          ],
          input:"",
          history:[],
