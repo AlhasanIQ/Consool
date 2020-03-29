@@ -10,23 +10,36 @@ class Line extends Component {
   }
   componentDidMount(){
     if (this.props.remote) {
-      this.fetch();
+      console.log('remote line mounted, '+ JSON.stringify(this.props.remote))
+      this.fetch(this.props.remote);
     }
   }
-  fetch(){
+  async fetch(remote){
+    let {cmd, args} = remote;
     if (this.props.remote) {
-      let _fetch = this.props.remote.fetch.bind(this);
-      _fetch(this.props.remote.cmd , this.props.remote.args);
+      const json = await async function(cmd, args){
+        const response = await fetch("http://localhost:3001/api/exec", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ cmd: cmd, args: args }),
+          Accept: "application/json"
+        }).then(function (response) {
+          return response.json();
+        })
+        .catch(function (error) {
+          return {
+            'result': 'Failed to connect to Backend!'
+          }
+        });
+        return response;
+      }(cmd, args);
+
+      this.setState({text: json.result});
     }
   }
 
-  fulfill(msg){
-    let message = msg.result;
-    this.setState({text:message})
-  }
-  reject(){
-    this.setState() //maybe do this from App.js state.lines directly  ?
-  }
   Angel(){
     if (this.props.type !== 'result') {
       return <span className="angel">$&gt;</span>

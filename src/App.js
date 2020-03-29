@@ -5,98 +5,100 @@ import './App.css';
 
 class App extends Component {
   constructor(props) {
-       super(props);
-       this.state = {
-         lines:[
-            <Line lineText='This is the ultimate sandboxed-linux-based personal website' key="0" id="0" /> ,
-            <Line lineText='type `help` to view the list of available commands' key="1" id="1" />
-         ],
-         input:"",
-         history:[],
-         currentHistory:null
-       };
-       this.focusOnInput = this.focusOnInput.bind(this);
-      this.handleRemoteCommand = this.handleRemoteCommand.bind(this);
-      this.localCommands = {
-        'help': "You can use a list of commands here : help,ls,cat,pwd,uname",
-        '?' : "You can use a list of commands here : help,ls,cat,pwd,uname" ,
-        'pwd': "/Universe/MilkyWay/Solar System/Earth/Iraq",
-        'uname': "thats some dedication :D get a life man"}
-   }
-   componentDidMount() {
-     this.focusOnInput();
-   }
+    super(props);
+    this.state = {
+      lines: [
+        {
+          "lineText":"This is the ultimate sandboxed-linux-based personal website",
+          "key":"0",
+          "id":"0"
+        },
+        {
+          "lineText":"type `help` to view the list of available commands",
+          "key":"1",
+          "id":"1"
+        }
+      ],
+      input: "",
+      history: [],
+      currentHistory: null
+    };
+    this.focusOnInput = this.focusOnInput.bind(this);
+    this.addLine = this.addLine.bind(this);
 
-   handleChange(e){
-       this.setState({'input':e.target.value});
-   }
-   addLine(){
-     let lines = this.state.lines;
-     let linesLength = lines.length;
-     let newline = this.state.input.trim();
-     lines.push(<Line lineText={newline} key={linesLength} id={linesLength} />);
-     this.setState({input:'' , lines: lines});
-     this.handleProLineAdd(newline);// handles the commands result
-   }
-   handleProLineAdd(command){// handles the commands result
-     let history = this.state.history;
-     history.unshift(command);
-     this.setState({history:history,currentHistory:null});
+    this.handleRemoteCommand = this.handleRemoteCommand.bind(this);
+    this.localCommands = {
+      help: "You can use a list of commands here : help,ls,cat,pwd,uname",
+      "?": "You can use a list of commands here : help,ls,cat,pwd,uname",
+      pwd: "/Universe/MilkyWay/Solar System/Earth/Iraq",
+      uname: "thats some dedication :D get a life man"
+    };
+  }
+  componentDidMount() {
+    this.focusOnInput();
+  }
+
+  handleChange(e) {
+    this.setState({ input: e.target.value });
+  }
+  addLine() {
+    let lines = this.state.lines;
+    let linesLength = lines.length;
+    let newline = this.state.input.trim();
+    lines.push({
+      "lineText":newline,
+      "key":linesLength,
+      "id":linesLength
+    });
+    
+    this.setState({ input: "", lines: lines });
+    this.handleProLineAdd(newline); // handles the commands result
+    // console.log('added line:' + JSON.stringify(lines[linesLength]));
+    
+  }
+  handleProLineAdd(command) {
+    // handles the commands result
+    let history = this.state.history;
+    history.unshift(command);
+    this.setState({ history: history, currentHistory: null });
 
 
      let cmd = command.split(" ")[0];
-     let args = command.split(" ");
+     let args = command.split(" ").splice(1);
 
-     //remove the cmd from args
-     args.shift();
-
-     if (this.isCommandLocal(cmd)) {// check if command local
-       this.handleLocalCommand(cmd)
-     }
-     else {// if remote command
-       this.handleRemoteCommand(cmd,args)
-     }
-   }
-   isCommandLocal(command){
-      return  Object.keys(this.localCommands).includes(command)
-   }
-   handleRemoteCommand(command , args = []){
-     let _fetch = function (command,args){
-       const that = this;
-        fetch("http://localhost:3001/api/exec", {
-         method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({'cmd':command,'args':args}),
-          Accept: 'application/json',
-        })
-        .then(function (response) {
-            // console.log(response);
-            return response.json();
-        })
-        .then(function (result) {
-            that.fulfill(result)
-        })
-        .catch(function (error) {
-          that.reject()
-          console.log('Request failed', error);
-        });
-     };
-
-    this.addResult("",{fetch:_fetch , cmd: command , args: args});
-   }
-   handleLocalCommand(command){
-     console.log('handling local',command,this.localCommands[command]);
-     this.addResult(this.localCommands[command])
-   }
-   addResult(result, remote = null){
-     let lines = this.state.lines;
-     let linesLength = lines.length;
-     lines.push(<Line lineText={result} key={linesLength} id={linesLength} type='result' remote={remote}/>);
-     this.setState({lines: lines});
-     return true;
-   }
+    if (this.isCommandLocal(cmd)) {
+      // check if command local
+      this.handleLocalCommand(cmd);
+    } else {
+      // if remote command
+      this.handleRemoteCommand(cmd, args);
+    }
+  }
+  isCommandLocal(command) {
+    return Object.keys(this.localCommands).includes(command);
+  }
+  handleRemoteCommand(command, args = []) {
+      this.addResult("", { cmd: command, args: args });
+  }
+  handleLocalCommand(command) {
+    // console.log("handling local", command, this.localCommands[command]);
+    this.addResult(this.localCommands[command]);
+  }
+  addResult(result, remote = null) {
+    let lines = this.state.lines;
+    let linesLength = lines.length;
+    lines.push(
+      {
+        "lineText": result,
+        "key": linesLength,
+        "id": linesLength,
+        "type": 'result',
+        "remote": remote
+      }
+    );
+    this.setState({ lines: lines });
+    return true;
+  }
 
    normalizeHeight(input){
      input.style.height = '1.2em';
@@ -146,17 +148,25 @@ class App extends Component {
        else return false;
    }
   render() {
-      return (
-        <div>
-          <div className="title">
-            <h1>Alhasan Ahmed<span className="cursor"></span></h1>
-          </div>
-          <div className="wrapper">
-            <div className="container" onClick={this.handleClick.bind(this)}>
-              <div className="text">
-                {this.state.lines}
+    return (
+      <div>
+        <div className="title">
+          <h1>
+            Alhasan Ahmed<span className="cursor"></span>
+          </h1>
+        </div>
+        <div className="wrapper">
+          <div className="container" onClick={this.handleClick.bind(this)}>
+            <div className="text">
+              {
+                this.state.lines.map( (line, index) => (
+                  <Line lineText={line.lineText} key={line.key} id={line.id} 
+                        remote={line.remote} type={line.type}
+                  />
+                ))
+              }
 
-                <span className="line input">
+              <span className="line input">
                   <span className="angel">$&gt;</span>
                     <textarea id="input"
                         ref={(input) => { this.textInput = input; }}
@@ -165,12 +175,11 @@ class App extends Component {
                       ></textarea>
                 </span>
 
-              </div>
-
             </div>
           </div>
         </div>
-      );
+      </div>
+    );
   }
 }
 
