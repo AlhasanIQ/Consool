@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import Line from './Line';
+import React, { Component } from "react";
+import Line from "./Line";
 
-import './App.css';
+import "./App.css";
 
 class App extends Component {
   constructor(props) {
@@ -9,14 +9,15 @@ class App extends Component {
     this.state = {
       lines: [
         {
-          "lineText":"This is the ultimate sandboxed-linux-based personal website",
-          "key":"0",
-          "id":"0"
+          lineText:
+            "This is the ultimate sandboxed-linux-based personal website",
+          key: "0",
+          id: "0"
         },
         {
-          "lineText":"type `help` to view the list of available commands",
-          "key":"1",
-          "id":"1"
+          lineText: "type `help` to view the list of available commands",
+          key: "1",
+          id: "1"
         }
       ],
       input: "",
@@ -46,15 +47,14 @@ class App extends Component {
     let linesLength = lines.length;
     let newline = this.state.input.trim();
     lines.push({
-      "lineText":newline,
-      "key":linesLength,
-      "id":linesLength
+      lineText: newline,
+      key: linesLength,
+      id: linesLength
     });
-    
+
     this.setState({ input: "", lines: lines });
     this.handleProLineAdd(newline); // handles the commands result
     // console.log('added line:' + JSON.stringify(lines[linesLength]));
-    
   }
   handleProLineAdd(command) {
     // handles the commands result
@@ -62,9 +62,8 @@ class App extends Component {
     history.unshift(command);
     this.setState({ history: history, currentHistory: null });
 
-
-     let cmd = command.split(" ")[0];
-     let args = command.split(" ").splice(1);
+    let cmd = command.split(" ")[0];
+    let args = command.split(" ").splice(1);
 
     if (this.isCommandLocal(cmd)) {
       // check if command local
@@ -78,7 +77,7 @@ class App extends Component {
     return Object.keys(this.localCommands).includes(command);
   }
   handleRemoteCommand(command, args = []) {
-      this.addResult("", { cmd: command, args: args });
+    this.addResult("", { cmd: command, args: args });
   }
   handleLocalCommand(command) {
     // console.log("handling local", command, this.localCommands[command]);
@@ -87,66 +86,65 @@ class App extends Component {
   addResult(result, remote = null) {
     let lines = this.state.lines;
     let linesLength = lines.length;
-    lines.push(
-      {
-        "lineText": result,
-        "key": linesLength,
-        "id": linesLength,
-        "type": 'result',
-        "remote": remote
-      }
-    );
+    lines.push({
+      lineText: result,
+      key: linesLength,
+      id: linesLength,
+      type: "result",
+      remote: remote
+    });
     this.setState({ lines: lines });
     return true;
   }
 
-   normalizeHeight(input){
-     input.style.height = '1.2em';
-     let maxCallStack = 0; //to prevent infinite loop that happens sometimes
-      while ((input.offsetHeight < input.scrollHeight) && (maxCallStack<16)) {
-        input.style.height = parseInt(input.style.height[0],10)+1 +'.2em';
-        maxCallStack++;
-      }
-   }
-   focusOnInput(){
+  normalizeHeight(input) {
+    input.style.height = "1.2em";
+    let maxCallStack = 0; //to prevent infinite loop that happens sometimes
+    while (input.offsetHeight < input.scrollHeight && maxCallStack < 16) {
+      input.style.height = parseInt(input.style.height[0], 10) + 1 + ".2em";
+      maxCallStack++;
+    }
+  }
+  focusOnInput() {
     this.textInput.focus();
-   }
-   handleClick(e){
-     e.preventDefault();
-     this.focusOnInput();
-   }
-   handleKeypressed(e){
-      //check if overflowed, call() normalizeHeight()
-      this.normalizeHeight(e.target);
-      if (e.keyCode === 38) {
-        if (this.state.currentHistory === null && this.state.history.length>0) {
-          e.target.value = this.state.history[0];
-          this.setState({currentHistory:0});
-        }else if(this.state.history.length>0){
-          if (this.state.currentHistory !== this.state.history.length -1) {
-            e.target.value = this.state.history[this.state.currentHistory+1];
-            this.setState({currentHistory: this.state.currentHistory+1 });
-          }
+  }
+  handleClick(e) {
+    e.preventDefault();
+    this.focusOnInput();
+  }
+  handleKeypressed(e) {
+    //check if overflowed, call() normalizeHeight()
+    this.normalizeHeight(e.target);
+    if (e.keyCode === 38) {
+      if (this.state.currentHistory === null && this.state.history.length > 0) {
+        e.target.value = this.state.history[0];
+        this.setState({ currentHistory: 0 });
+      } else if (this.state.history.length > 0) {
+        if (this.state.currentHistory !== this.state.history.length - 1) {
+          e.target.value = this.state.history[this.state.currentHistory + 1];
+          this.setState({ currentHistory: this.state.currentHistory + 1 });
         }
-
       }
-      if (e.keyCode === 13){//if key is Enter
-        if(e.target.value.trim().length>0) {//if input val is not blank
+    }
+    if (e.keyCode === 13) {
+      //if key is Enter
+      if (e.target.value.trim().length > 0) {
+        //if input val is not blank
         this.addLine();
-        e.target.value = '';
+        e.target.value = "";
         e.target.scrollIntoView();
         this.normalizeHeight(e.target);
-        }
-        else {//input val is blank
-          this.setState({input:''});
-          e.target.value = '';
-        }
+      } else {
+        //input val is blank
+        this.setState({ input: "" });
+        e.target.value = "";
       }
-   }
-   isLast(id){
-       if(this.state.lines.length -1 === parseInt(id,10) ) return true;
-       else return false;
-   }
+    }
+  }
+  isLast(id) {
+    if (this.state.lines.length - 1 === parseInt(id, 10)) return true;
+    else return false;
+  }
   render() {
     return (
       <div>
@@ -158,23 +156,27 @@ class App extends Component {
         <div className="wrapper">
           <div className="container" onClick={this.handleClick.bind(this)}>
             <div className="text">
-              {
-                this.state.lines.map( (line, index) => (
-                  <Line lineText={line.lineText} key={line.key} id={line.id} 
-                        remote={line.remote} type={line.type}
-                  />
-                ))
-              }
+              {this.state.lines.map((line, index) => (
+                <Line
+                  lineText={line.lineText}
+                  key={line.key}
+                  id={line.id}
+                  remote={line.remote}
+                  type={line.type}
+                />
+              ))}
 
               <span className="line input">
-                  <span className="angel">$&gt;</span>
-                    <textarea id="input"
-                        ref={(input) => { this.textInput = input; }}
-                        onChange={this.handleChange.bind(this)}
-                        onKeyUp={this.handleKeypressed.bind(this)}
-                      ></textarea>
-                </span>
-
+                <span className="angel">$&gt;</span>
+                <textarea
+                  id="input"
+                  ref={input => {
+                    this.textInput = input;
+                  }}
+                  onChange={this.handleChange.bind(this)}
+                  onKeyUp={this.handleKeypressed.bind(this)}
+                ></textarea>
+              </span>
             </div>
           </div>
         </div>
