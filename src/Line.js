@@ -40,9 +40,9 @@ class Line extends Component {
     }
   }
 
-  Angel() {
+  Angle() {
     if (this.props.type !== "result") {
-      return <span className="angel">$&gt;</span>;
+      return <span className="angle">$&gt;</span>;
     } else return "";
   }
   Text() {
@@ -81,7 +81,7 @@ class Line extends Component {
   render() {
     return (
       <span className="line">
-        {this.Angel()}
+        {this.Angle()}
         {this.Text()}
         {/* {cursor} */}
       </span>

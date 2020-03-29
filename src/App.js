@@ -167,7 +167,7 @@ class App extends Component {
               ))}
 
               <span className="line input">
-                <span className="angel">$&gt;</span>
+                <span className="angle">$&gt;</span>
                 <textarea
                   id="input"
                   ref={input => {
